@@ -13,6 +13,7 @@
 package org.assertj.core.api;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Spliterators.emptySpliterator;
 import static java.util.stream.Collectors.toList;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.in;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 import static org.assertj.core.api.InstanceOfAssertFactories.THROWABLE;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -42,6 +44,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -734,6 +737,10 @@ class BDDSoftAssertionsTest extends BaseAssertionsTest {
     softly.then(emptyList()).element(1);
     // the nested proxied call to isNotEmpty() throw an Assertion error that must be propagated to the caller.
     softly.then(emptyList()).element(1, as(STRING));
+    // the nested proxied call to isNotEmpty() throw an Assertion error that must be propagated to the caller.
+    softly.then(emptyList()).elements(0, 1, 2);
+    // the nested proxied call to checkIndexValidity throw an Assertion error that must be propagated to the caller.
+    softly.then(list("a", "b")).elements(0, 5);
     // the nested proxied call to assertHasSize() throw an Assertion error that must be propagated to the caller.
     softly.then(emptyList()).singleElement();
     // the nested proxied call to assertHasSize() throw an Assertion error that must be propagated to the caller.
@@ -745,7 +752,7 @@ class BDDSoftAssertionsTest extends BaseAssertionsTest {
     // nested proxied call to isCompleted
     softly.then(new CompletableFuture<String>()).isCompletedWithValue("done");
     // it must be caught by softly.assertAll()
-    assertThat(softly.errorsCollected()).hasSize(11);
+    assertThat(softly.errorsCollected()).hasSize(13);
   }
 
   // bug #447
@@ -942,15 +949,21 @@ class BDDSoftAssertionsTest extends BaseAssertionsTest {
           .last()
           .as("last element")
           .isNull();
+    softly.then(names)
+          .as("elements(0, 1)")
+          .overridingErrorMessage("error message")
+          .elements(0, 1)
+          .isNull();
     // THEN
     List<Throwable> errorsCollected = softly.errorsCollected();
-    assertThat(errorsCollected).hasSize(6);
+    assertThat(errorsCollected).hasSize(7);
     assertThat(errorsCollected.get(0)).hasMessageContaining("10");
     assertThat(errorsCollected.get(1)).hasMessageContaining("22");
     assertThat(errorsCollected.get(2)).hasMessageContaining("empty");
     assertThat(errorsCollected.get(3)).hasMessageContaining("first element");
     assertThat(errorsCollected.get(4)).hasMessageContaining("element(0)");
     assertThat(errorsCollected.get(5)).hasMessageContaining("last element");
+    assertThat(errorsCollected.get(6)).hasMessage("[elements(0, 1)] error message");
   }
 
   @Test
@@ -978,14 +991,20 @@ class BDDSoftAssertionsTest extends BaseAssertionsTest {
           .last()
           .as("last element")
           .isNull();
+    softly.then(names)
+          .as("elements(0, 1)")
+          .overridingErrorMessage("error message")
+          .elements(0, 1)
+          .isNull();
     // THEN
     List<Throwable> errorsCollected = softly.errorsCollected();
-    assertThat(errorsCollected).hasSize(6);
+    assertThat(errorsCollected).hasSize(7);
     assertThat(errorsCollected.get(0)).hasMessageContaining("10");
     assertThat(errorsCollected.get(1)).hasMessageContaining("22");
     assertThat(errorsCollected.get(2)).hasMessageContaining("empty");
     assertThat(errorsCollected.get(3)).hasMessageContaining("first element");
     assertThat(errorsCollected.get(4)).hasMessageContaining("element(0)");
+    assertThat(errorsCollected.get(5)).hasMessageContaining("last element");
     assertThat(errorsCollected.get(5)).hasMessageContaining("last element");
   }
 
@@ -1829,4 +1848,49 @@ class BDDSoftAssertionsTest extends BaseAssertionsTest {
     }
   }
 
+  @Test
+  void path_soft_assertions_should_report_errors_on_methods_that_switch_the_object_under_test() {
+    // GIVEN
+    Path path = new File("src/test/resources/actual_file.txt").toPath();
+    // WHEN
+    softly.then(path)
+          .overridingErrorMessage("error message")
+          .as("content()")
+          .content()
+          .startsWith("actual")
+          .startsWith("123");
+    softly.then(path)
+          .overridingErrorMessage("error message")
+          .as("content(UTF_8)")
+          .content(UTF_8)
+          .startsWith("actual")
+          .startsWith("123");
+    // THEN
+    then(softly.errorsCollected()).extracting(Throwable::getMessage)
+                                  .containsExactly("[content()] error message",
+                                                   "[content(UTF_8)] error message");
+  }
+
+  @Test
+  void file_soft_assertions_should_report_errors_on_methods_that_switch_the_object_under_test() {
+    // GIVEN
+    File file = new File("src/test/resources/actual_file.txt");
+    // WHEN
+    softly.then(file)
+          .overridingErrorMessage("error message")
+          .as("content()")
+          .content()
+          .startsWith("actual")
+          .startsWith("123");
+    softly.then(file)
+          .overridingErrorMessage("error message")
+          .as("content(UTF_8)")
+          .content(UTF_8)
+          .startsWith("actual")
+          .startsWith("123");
+    // THEN
+    then(softly.errorsCollected()).extracting(Throwable::getMessage)
+                                  .containsExactly("[content()] error message",
+                                                   "[content(UTF_8)] error message");
+  }
 }

@@ -12,6 +12,7 @@
  */
 package org.assertj.core.api;
 
+import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.entry;
@@ -1070,7 +1071,7 @@ public abstract class AbstractMapAssert<SELF extends AbstractMapAssert<SELF, ACT
   // This method is protected in order to be proxied for SoftAssertions / Assumptions.
   // The public method for it (the one not ending with "ForProxy") is marked as final and annotated with @SafeVarargs
   // in order to avoid compiler warning in user code
-  protected SELF containsKeysForProxy(@SuppressWarnings("unchecked") K... keys) {
+  protected SELF containsKeysForProxy(K[] keys) {
     maps.assertContainsKeys(info, actual, keys);
     return myself;
   }
@@ -1135,7 +1136,11 @@ public abstract class AbstractMapAssert<SELF extends AbstractMapAssert<SELF, ACT
 
   /**
    * Verifies that the actual map contains only the given keys and nothing else, in any order.
-   *
+   * <p>
+   * The verification tries to honor the key comparison semantic of the underlying map implementation.
+   * The map under test has to be cloned to identify unexpected elements, but depending on the map implementation
+   * this may not always be possible. In case it is not possible, a regular map is used and the key comparison strategy
+   * may not be the same as the map under test.
    * <p>
    * Examples :
    * <pre><code class='java'> Map&lt;Ring, TolkienCharacter&gt; ringBearers = new HashMap&lt;&gt;();
@@ -1172,7 +1177,11 @@ public abstract class AbstractMapAssert<SELF extends AbstractMapAssert<SELF, ACT
 
   /**
    * Verifies that the actual map contains only the given keys and nothing else, in any order.
-   *
+   * <p>
+   * The verification tries to honor the key comparison semantic of the underlying map implementation.
+   * The map under test has to be cloned to identify unexpected elements, but depending on the map implementation
+   * this may not always be possible. In case it is not possible, a regular map is used and the key comparison strategy
+   * may not be the same as the map under test.
    * <p>
    * Examples :
    * <pre><code class='java'> Map&lt;Ring, TolkienCharacter&gt; ringBearers = new HashMap&lt;&gt;();
@@ -1201,7 +1210,7 @@ public abstract class AbstractMapAssert<SELF extends AbstractMapAssert<SELF, ACT
     if (keys instanceof Path) {
       // do not treat Path as an Iterable
       K path = (K) keys;
-      maps.assertContainsOnlyKeys(info, actual, path);
+      maps.assertContainsOnlyKeys(info, actual, singleton(path));
     } else {
       maps.assertContainsOnlyKeys(info, actual, keys);
     }
@@ -1297,7 +1306,11 @@ public abstract class AbstractMapAssert<SELF extends AbstractMapAssert<SELF, ACT
 
   /**
    * Verifies that the actual map contains only the given entries and nothing else, in any order.
-   *
+   * <p>
+   * The verification tries to honor the key comparison semantic of the underlying map implementation.
+   * The map under test has to be cloned to identify unexpected elements, but depending on the map implementation
+   * this may not always be possible. In case it is not possible, a regular map is used and the key comparison strategy
+   * may not be the same as the map under test.
    * <p>
    * Examples :
    * <pre><code class='java'> Map&lt;Ring, TolkienCharacter&gt; ringBearers = new HashMap&lt;&gt;();

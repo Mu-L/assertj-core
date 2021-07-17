@@ -13,6 +13,7 @@
 package org.assertj.core.api;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.as;
@@ -46,6 +47,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.OffsetTime;
@@ -946,6 +948,10 @@ class SoftAssertionsTest extends BaseAssertionsTest {
     // the nested proxied call to isNotEmpty() throw an Assertion error that must be propagated to the caller.
     softly.assertThat(emptyList()).element(0, as(STRING));
     // the nested proxied call to isNotEmpty() throw an Assertion error that must be propagated to the caller.
+    softly.assertThat(emptyList()).elements(0, 1, 2);
+    // the nested proxied call to checkIndexValidity throw an Assertion error that must be propagated to the caller.
+    softly.assertThat(list("a", "b")).elements(0, 5);
+    // the nested proxied call to isNotEmpty() throw an Assertion error that must be propagated to the caller.
     softly.assertThat(emptyList()).last();
     // the nested proxied call to isNotEmpty() throw an Assertion error that must be propagated to the caller.
     softly.assertThat(emptyList()).last(as(STRING));
@@ -966,7 +972,7 @@ class SoftAssertionsTest extends BaseAssertionsTest {
     // nested proxied call to isGreaterThan
     softly.assertThat(Duration.ofDays(-1)).isPositive();
     // it must be caught by softly.assertAll()
-    assertThat(softly.errorsCollected()).hasSize(14);
+    assertThat(softly.errorsCollected()).hasSize(16);
   }
 
   @Test
@@ -1136,9 +1142,14 @@ class SoftAssertionsTest extends BaseAssertionsTest {
           .overridingErrorMessage("error message")
           .last(as(type(Name.class)))
           .isNull();
+    softly.assertThat(names)
+          .as("elements(0, 1)")
+          .overridingErrorMessage("error message")
+          .elements(0, 1)
+          .isNull();
     // THEN
     List<Throwable> errorsCollected = softly.errorsCollected();
-    assertThat(errorsCollected).hasSize(9);
+    assertThat(errorsCollected).hasSize(10);
     assertThat(errorsCollected.get(0)).hasMessage("[size isGreaterThan(10)] error message");
     assertThat(errorsCollected.get(1)).hasMessage("[size isGreaterThan(22)] error message");
     assertThat(errorsCollected.get(2)).hasMessage("[should not be empty] error message 2");
@@ -1148,6 +1159,7 @@ class SoftAssertionsTest extends BaseAssertionsTest {
     assertThat(errorsCollected.get(6)).hasMessage("[element(0) as Name] error message");
     assertThat(errorsCollected.get(7)).hasMessage("[last element] error message");
     assertThat(errorsCollected.get(8)).hasMessage("[last element as Name] error message");
+    assertThat(errorsCollected.get(9)).hasMessage("[elements(0, 1)] error message");
   }
 
   @Test
@@ -1199,9 +1211,14 @@ class SoftAssertionsTest extends BaseAssertionsTest {
           .overridingErrorMessage("error message")
           .last(as(type(Name.class)))
           .isNull();
+    softly.assertThat(names)
+          .as("elements(0, 1)")
+          .overridingErrorMessage("error message")
+          .elements(0, 1)
+          .isNull();
     // THEN
     List<Throwable> errorsCollected = softly.errorsCollected();
-    assertThat(errorsCollected).hasSize(9);
+    assertThat(errorsCollected).hasSize(10);
     assertThat(errorsCollected.get(0)).hasMessage("[size isGreaterThan(10)] error message");
     assertThat(errorsCollected.get(1)).hasMessage("[size isGreaterThan(22)] error message");
     assertThat(errorsCollected.get(2)).hasMessage("[shoud not be empty] error message 2");
@@ -1211,6 +1228,7 @@ class SoftAssertionsTest extends BaseAssertionsTest {
     assertThat(errorsCollected.get(6)).hasMessage("[element(0) as Name] error message");
     assertThat(errorsCollected.get(7)).hasMessage("[last element] error message");
     assertThat(errorsCollected.get(8)).hasMessage("[last element as Name] error message");
+    assertThat(errorsCollected.get(9)).hasMessage("[elements(0, 1)] error message");
   }
 
   @Test
@@ -2483,5 +2501,51 @@ class SoftAssertionsTest extends BaseAssertionsTest {
     assertThat(errorsCollected).hasSize(2);
     assertThat(errorsCollected.get(0)).hasMessageContaining("not top level message");
     assertThat(errorsCollected.get(1)).hasMessageContaining("not root cause message");
+  }
+
+  @Test
+  void path_soft_assertions_should_report_errors_on_methods_that_switch_the_object_under_test() {
+    // GIVEN
+    Path path = new File("src/test/resources/actual_file.txt").toPath();
+    // WHEN
+    softly.assertThat(path)
+          .overridingErrorMessage("error message")
+          .as("content()")
+          .content()
+          .startsWith("actual")
+          .startsWith("123");
+    softly.assertThat(path)
+          .overridingErrorMessage("error message")
+          .as("content(UTF_8)")
+          .content(UTF_8)
+          .startsWith("actual")
+          .startsWith("123");
+    // THEN
+    then(softly.errorsCollected()).extracting(Throwable::getMessage)
+                                  .containsExactly("[content()] error message",
+                                                   "[content(UTF_8)] error message");
+  }
+
+  @Test
+  void file_soft_assertions_should_report_errors_on_methods_that_switch_the_object_under_test() {
+    // GIVEN
+    File file = new File("src/test/resources/actual_file.txt");
+    // WHEN
+    softly.assertThat(file)
+          .overridingErrorMessage("error message")
+          .as("content()")
+          .content()
+          .startsWith("actual")
+          .startsWith("123");
+    softly.assertThat(file)
+          .overridingErrorMessage("error message")
+          .as("content(UTF_8)")
+          .content(UTF_8)
+          .startsWith("actual")
+          .startsWith("123");
+    // THEN
+    then(softly.errorsCollected()).extracting(Throwable::getMessage)
+                                  .containsExactly("[content()] error message",
+                                                   "[content(UTF_8)] error message");
   }
 }
