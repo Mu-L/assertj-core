@@ -1234,8 +1234,10 @@ public abstract class AbstractFileAssert<SELF extends AbstractFileAssert<SELF>> 
    * @throws UncheckedIOException when failing to read the actual {@code File}.
    */
   public AbstractByteArrayAssert<?> binaryContent() {
-    files.assertCanRead(info, actual);
-    return new ByteArrayAssert(readFile()).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      files.assertCanRead(info, actual);
+      return new ByteArrayAssert(readFile()).withAssertionState(myself);
+    }, ByteArrayAssert::nullByteArrayAssert);
   }
 
   /**
@@ -1333,11 +1335,12 @@ public abstract class AbstractFileAssert<SELF extends AbstractFileAssert<SELF>> 
     return result;
   }
 
-  // this method was introduced to avoid double proxying in soft assertions for content()
   private AbstractStringAssert<?> internalContent(Charset charset) {
-    files.assertCanRead(info, actual);
-    String fileContent = readFile(charset);
-    return new StringAssert(fileContent).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      files.assertCanRead(info, actual);
+      String fileContent = readFile(charset);
+      return new StringAssert(fileContent).withAssertionState(myself);
+    }, StringAssert::nullStringAssert);
   }
 
   private byte[] readFile() {

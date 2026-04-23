@@ -27,9 +27,8 @@ import org.assertj.core.internal.Iterators;
  * <p>Note that none of the assertions modify the actual iterator, i.e. they do not consume any elements.
  * In order to use consuming assertions, use {@link #toIterable()}.</p>
  *
- * @param <SELF> the "self" type of this assertion class.
+ * @param <SELF>    the "self" type of this assertion class.
  * @param <ELEMENT> the type of elements.
- *
  * @author Stephan Windmüller
  * @since 3.12.0
  */
@@ -42,7 +41,7 @@ public abstract class AbstractIteratorAssert<SELF extends AbstractIteratorAssert
   /**
    * Creates a new <code>{@link org.assertj.core.api.AbstractIteratorAssert}</code>.
    *
-   * @param actual the actual value to verify
+   * @param actual   the actual value to verify
    * @param selfType the "self type"
    */
   protected AbstractIteratorAssert(Iterator<? extends ELEMENT> actual, Class<?> selfType) {
@@ -51,14 +50,14 @@ public abstract class AbstractIteratorAssert<SELF extends AbstractIteratorAssert
 
   /**
    * <p>Verifies that the actual {@code Iterator} has at least one more element.</p>
-   *
+   * <p>
    * Example:
    * <pre><code class='java'> Iterator&lt;TolkienCharacter&gt; elvesRingBearers = list(galadriel, elrond, gandalf).iterator();
    *
    * assertThat(elvesRingBearers).hasNext();</code></pre>
    *
-   * @throws AssertionError if the actual {@code Iterator} is {@code null} or does not have another element.
    * @return this assertion object.
+   * @throws AssertionError if the actual {@code Iterator} is {@code null} or does not have another element.
    * @since 3.12.0
    */
   public SELF hasNext() {
@@ -67,14 +66,14 @@ public abstract class AbstractIteratorAssert<SELF extends AbstractIteratorAssert
 
   /**
    * <p>Verifies that the actual {@code Iterator} has no more elements.</p>
-   *
+   * <p>
    * Example:
    * <pre><code class='java'> Iterator&lt;String&gt; result = Collections.emptyList().iterator();
    *
    * assertThat(result).isExhausted();</code></pre>
    *
-   * @throws AssertionError if the actual {@code Iterator} is {@code null} or has another element.
    * @return this assertion object.
+   * @throws AssertionError if the actual {@code Iterator} is {@code null} or has another element.
    * @since 3.12.0
    */
   public SELF isExhausted() {
@@ -93,7 +92,10 @@ public abstract class AbstractIteratorAssert<SELF extends AbstractIteratorAssert
    * @since 3.12.0
    */
   public IterableAssert<ELEMENT> toIterable() {
-    return new IterableAssert<>(IterableAssert.toIterable(actual));
+    return executeAssertionNavigation(() -> {
+      isNotNull();
+      return new IterableAssert<ELEMENT>(IterableAssert.toIterable(actual)).withAssertionState(myself);
+    }, IterableAssert::nullIterableAssert);
   }
 
   /**

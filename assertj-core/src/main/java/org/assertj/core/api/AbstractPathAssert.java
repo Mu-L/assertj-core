@@ -1808,8 +1808,10 @@ public abstract class AbstractPathAssert<SELF extends AbstractPathAssert<SELF>> 
    * @throws UncheckedIOException when failing to read the actual {@code Path}.
    */
   public AbstractByteArrayAssert<?> binaryContent() {
-    paths.assertIsReadable(info, actual);
-    return new ByteArrayAssert(readPath()).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      paths.assertIsReadable(info, actual);
+      return new ByteArrayAssert(readPath()).withAssertionState(myself);
+    }, ByteArrayAssert::nullByteArrayAssert);
   }
 
   /**
@@ -1830,8 +1832,7 @@ public abstract class AbstractPathAssert<SELF extends AbstractPathAssert<SELF>> 
    * @since 3.21.0
    */
   public AbstractStringAssert<?> content() {
-    // does not call content(Charset.defaultCharset()) to avoid double proxying in soft assertions.
-    return internalContent(Charset.defaultCharset());
+    return content(Charset.defaultCharset());
   }
 
   /**
@@ -1853,14 +1854,11 @@ public abstract class AbstractPathAssert<SELF extends AbstractPathAssert<SELF>> 
    * @since 3.21.0
    */
   public AbstractStringAssert<?> content(Charset charset) {
-    return internalContent(charset);
-  }
-
-  // this method was introduced to avoid double proxying in soft assertions for content()
-  private AbstractStringAssert<?> internalContent(Charset charset) {
-    paths.assertIsReadable(info, actual);
-    String pathContent = readPath(charset);
-    return new StringAssert(pathContent).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      paths.assertIsReadable(info, actual);
+      String pathContent = readPath(charset);
+      return new StringAssert(pathContent).withAssertionState(myself);
+    }, StringAssert::nullStringAssert);
   }
 
   private byte[] readPath() {

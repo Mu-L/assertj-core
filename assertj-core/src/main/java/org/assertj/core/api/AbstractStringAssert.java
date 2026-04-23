@@ -68,7 +68,6 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return {@code this} assertion object.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is greater than or equal to the given one.
-   *
    * @since 3.11.0
    */
   public SELF isLessThan(String other) {
@@ -97,7 +96,6 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return {@code this} assertion object.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is greater than the given one.
-   *
    * @since 3.11.0
    */
   public SELF isLessThanOrEqualTo(String other) {
@@ -126,7 +124,6 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return {@code this} assertion object.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is less than or equal to the given one.
-   *
    * @since 3.11.0
    */
   public SELF isGreaterThan(String other) {
@@ -155,7 +152,6 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return {@code this} assertion object.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is less than the given one.
-   *
    * @since 3.11.0
    */
   public SELF isGreaterThanOrEqualTo(String other) {
@@ -182,13 +178,12 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * assertThat(&quot;ab&quot;).isBetween(&quot;abc&quot;, &quot;ac&quot;);</code></pre>
    *
    * @param startInclusive the start value (inclusive), expected not to be null.
-   * @param endInclusive the end value (inclusive), expected not to be null.
+   * @param endInclusive   the end value (inclusive), expected not to be null.
    * @return this assertion object.
-   * @throws AssertionError if the actual value is {@code null}.
+   * @throws AssertionError       if the actual value is {@code null}.
    * @throws NullPointerException if start value is {@code null}.
    * @throws NullPointerException if end value is {@code null}.
-   * @throws AssertionError if the actual value is not in the [start, end] range.
-   *
+   * @throws AssertionError       if the actual value is not in the [start, end] range.
    * @since 3.11.0
    */
   public SELF isBetween(String startInclusive, String endInclusive) {
@@ -214,13 +209,12 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * assertThat(&quot;ab&quot;).isStrictlyBetween(&quot;abc&quot;, &quot;ac&quot;);</code></pre>
    *
    * @param startExclusive the start value (exclusive), expected not to be null.
-   * @param endExclusive the end value (exclusive), expected not to be null.
+   * @param endExclusive   the end value (exclusive), expected not to be null.
    * @return this assertion object.
-   * @throws AssertionError if the actual value is {@code null}.
+   * @throws AssertionError       if the actual value is {@code null}.
    * @throws NullPointerException if start value is {@code null}.
    * @throws NullPointerException if end value is {@code null}.
-   * @throws AssertionError if the actual value is not in ]start, end[ range.
-   *
+   * @throws AssertionError       if the actual value is not in ]start, end[ range.
    * @since 3.11.0
    */
   public SELF isStrictlyBetween(String startExclusive, String endExclusive) {
@@ -243,7 +237,6 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return this assertion object.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is not a valid Base64 encoded string.
-   *
    * @since 3.16.0
    */
   public SELF isBase64() {
@@ -266,13 +259,14 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return a new {@link ByteArrayAssert} instance whose array under test is the result of the decoding.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is not a valid Base64 encoded string.
-   *
    * @since 3.22.0
    */
   @CheckReturnValue
   public AbstractByteArrayAssert<?> asBase64Decoded() {
-    isBase64();
-    return new ByteArrayAssert(Base64.getDecoder().decode(actual)).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      isBase64();
+      return new ByteArrayAssert(Base64.getDecoder().decode(actual)).withAssertionState(myself);
+    }, ByteArrayAssert::nullByteArrayAssert);
   }
 
   /**
@@ -288,7 +282,6 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return this assertion object.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is not a valid Base64 URL encoded string.
-   *
    * @since 4.0.0
    */
   public SELF isBase64Url() {
@@ -308,13 +301,14 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @return a new {@link ByteArrayAssert} instance whose array under test is the result of the decoding.
    * @throws AssertionError if the actual value is {@code null}.
    * @throws AssertionError if the actual value is not a valid Base64 URL encoded string.
-   *
    * @since 4.0.0
    */
   @CheckReturnValue
   public AbstractByteArrayAssert<?> asBase64UrlDecoded() {
-    isBase64Url();
-    return new ByteArrayAssert(Base64.getUrlDecoder().decode(actual)).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      isBase64Url();
+      return new ByteArrayAssert(Base64.getUrlDecoder().decode(actual)).withAssertionState(myself);
+    }, ByteArrayAssert::nullByteArrayAssert);
   }
 
   /**
@@ -333,8 +327,8 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * assertThat(&quot;abc&quot;).isEqualTo(&quot;ABC&quot;);</code></pre>
    *
    * @param customComparator the comparator to use for the incoming assertions.
-   * @throws NullPointerException if the given comparator is {@code null}.
    * @return {@code this} assertion object.
+   * @throws NullPointerException if the given comparator is {@code null}.
    */
   @Override
   @CheckReturnValue
@@ -357,10 +351,10 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * // assertion fails as it relies on String natural comparator
    * assertThat(&quot;abc&quot;).isEqualTo(&quot;ABC&quot;);</code></pre>
    *
-   * @param customComparator the comparator to use for the incoming assertions.
+   * @param customComparator            the comparator to use for the incoming assertions.
    * @param customComparatorDescription comparator description to be used in assertion error messages
-   * @throws NullPointerException if the given comparator is {@code null}.
    * @return {@code this} assertion object.
+   * @throws NullPointerException if the given comparator is {@code null}.
    */
   @Override
   @CheckReturnValue
@@ -396,14 +390,13 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * assertThat(&quot;1&quot;).isEqualTo(&quot;%s%s&quot;, 1); </code></pre>
    *
    * @param expectedStringTemplate the format template used to build the expected String.
-   * @param args the arguments referenced by the format specifiers in the format string.
-   * @throws NullPointerException if stringTemplate parameter is {@code null}.
-   * @throws AssertionError if the actual value is {@code null} as the template you provide must not be {@code null}.
-   * @throws java.util.IllegalFormatException as in {@link String#format(String, Object...)}, see
-   *         <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#detail">Details</a> section of the
-   *         formatter class specification.
+   * @param args                   the arguments referenced by the format specifiers in the format string.
    * @return this assertion object.
-   *
+   * @throws NullPointerException             if stringTemplate parameter is {@code null}.
+   * @throws AssertionError                   if the actual value is {@code null} as the template you provide must not be {@code null}.
+   * @throws java.util.IllegalFormatException as in {@link String#format(String, Object...)}, see
+   *                                          <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html#detail">Details</a> section of the
+   *                                          formatter class specification.
    * @since 3.12.0
    */
   public SELF isEqualTo(String expectedStringTemplate, Object... args) {
@@ -438,7 +431,6 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * assertThat((String) null).asBoolean().isFalse(); </code></pre>
    *
    * @return a new {@link BooleanAssert} instance whose value under test is the result of the parse.
-   *
    * @since 3.25.0
    */
   public AbstractBooleanAssert<?> asBoolean() {
@@ -459,15 +451,16 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    *
    * @return a new {@link ByteAssert} instance whose value under test is the result of the parse.
    * @throws AssertionError if the actual value is null or not a valid byte.
-   *
    * @since 3.25.0
    */
   public AbstractByteAssert<?> asByte() {
-    try {
-      return InstanceOfAssertFactories.BYTE.createAssert(Byte.parseByte(actual)).withAssertionState(myself);
-    } catch (NumberFormatException e) {
-      throw failures.failure(info, shouldBeNumeric(actual, BYTE));
-    }
+    return executeAssertionNavigation(() -> {
+      try {
+        return InstanceOfAssertFactories.BYTE.createAssert(Byte.parseByte(actual)).withAssertionState(myself);
+      } catch (NumberFormatException e) {
+        throw failures.failure(info, shouldBeNumeric(actual, BYTE));
+      }
+    }, ByteAssert::nullByteAssert);
   }
 
   /**
@@ -483,12 +476,13 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    *
    * @return a new {@link AbstractByteArrayAssert} instance whose value under test is the result of parsing the string.
    * @throws AssertionError if the actual string is {@code null}.
-   *
    * @since 3.26.0
    */
   public AbstractByteArrayAssert<?> bytes() {
-    isNotNull();
-    return InstanceOfAssertFactories.BYTE_ARRAY.createAssert(actual.getBytes()).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      isNotNull();
+      return InstanceOfAssertFactories.BYTE_ARRAY.createAssert(actual.getBytes()).withAssertionState(myself);
+    }, ByteArrayAssert::nullByteArrayAssert);
   }
 
   /**
@@ -497,21 +491,23 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * Examples:
    * <pre><code class='java'> assertThat("abc").bytes(StandardCharsets.US_ASCII)
    *                  .isEqualTo("abc".getBytes(StandardCharsets.US_ASCII));
-   * 
+   *
    * assertThat("").bytes(StandardCharsets.US_ASCII)
    *               .isEmpty(); </code></pre>
    *
    * @param charset the {@link Charset} to be used to encode the string.
    * @return a new {@link AbstractByteArrayAssert} instance whose value under test is the result of parsing the string.
    * @throws NullPointerException if charset parameter is {@code null}.
-   * @throws AssertionError if the actual string is {@code null}.
-   *
+   * @throws AssertionError       if the actual string is {@code null}.
    * @since 3.26.0
    */
   public AbstractByteArrayAssert<?> bytes(Charset charset) {
-    isNotNull();
-    byte[] bytes = actual.getBytes(requireNonNull(charset, "The charset must not be null"));
-    return InstanceOfAssertFactories.BYTE_ARRAY.createAssert(bytes).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      isNotNull();
+      requireNonNull(charset, "The charset must not be null");
+      byte[] bytes = actual.getBytes(charset);
+      return InstanceOfAssertFactories.BYTE_ARRAY.createAssert(bytes).withAssertionState(myself);
+    }, ByteArrayAssert::nullByteArrayAssert);
   }
 
   /**
@@ -527,18 +523,20 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    * @param charsetName the Charset to be used to encode the string.
    * @return a new {@link AbstractByteArrayAssert} instance whose value under test is the result of parsing the string.
    * @throws NullPointerException if named charset parameter is {@code null}.
-   * @throws AssertionError if the actual string is {@code null} or if the named charset parameter is not supported.
-   *
+   * @throws AssertionError       if the actual string is {@code null} or if the named charset parameter is not supported.
    * @since 3.26.0
    */
   public AbstractByteArrayAssert<?> bytes(String charsetName) {
-    isNotNull();
-    try {
-      byte[] bytes = actual.getBytes(requireNonNull(charsetName, "The charsetName must not be null"));
-      return InstanceOfAssertFactories.BYTE_ARRAY.createAssert(bytes).withAssertionState(myself);
-    } catch (UnsupportedEncodingException e) {
-      throw failures.failure(charsetName + " is not a supported Charset");
-    }
+    return executeAssertionNavigation(() -> {
+      isNotNull();
+      requireNonNull(charsetName, "The charsetName must not be null");
+      try {
+        byte[] bytes = actual.getBytes(charsetName);
+        return InstanceOfAssertFactories.BYTE_ARRAY.createAssert(bytes).withAssertionState(myself);
+      } catch (UnsupportedEncodingException e) {
+        throw failures.failure(charsetName + " is not a supported Charset");
+      }
+    }, ByteArrayAssert::nullByteArrayAssert);
   }
 
   /**
@@ -555,15 +553,16 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    *
    * @return a new {@link ShortAssert} instance whose value under test is the result of the parse.
    * @throws AssertionError if the actual value is null or not a valid short.
-   *
    * @since 3.25.0
    */
   public AbstractShortAssert<?> asShort() {
-    try {
-      return InstanceOfAssertFactories.SHORT.createAssert(Short.parseShort(actual)).withAssertionState(myself);
-    } catch (NumberFormatException e) {
-      throw failures.failure(info, shouldBeNumeric(actual, SHORT));
-    }
+    return executeAssertionNavigation(() -> {
+      try {
+        return InstanceOfAssertFactories.SHORT.createAssert(Short.parseShort(actual)).withAssertionState(myself);
+      } catch (NumberFormatException e) {
+        throw failures.failure(info, shouldBeNumeric(actual, SHORT));
+      }
+    }, ShortAssert::nullShortAssert);
   }
 
   /**
@@ -580,15 +579,16 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    *
    * @return a new {@link IntegerAssert} instance whose value under test is the result of the parse.
    * @throws AssertionError if the actual value is null or not a valid int.
-   *
    * @since 3.25.0
    */
   public AbstractIntegerAssert<?> asInt() {
-    try {
-      return InstanceOfAssertFactories.INTEGER.createAssert(Integer.parseInt(actual)).withAssertionState(myself);
-    } catch (NumberFormatException e) {
-      throw failures.failure(info, shouldBeNumeric(actual, INTEGER));
-    }
+    return executeAssertionNavigation(() -> {
+      try {
+        return InstanceOfAssertFactories.INTEGER.createAssert(Integer.parseInt(actual)).withAssertionState(myself);
+      } catch (NumberFormatException e) {
+        throw failures.failure(info, shouldBeNumeric(actual, INTEGER));
+      }
+    }, IntegerAssert::nullIntegerAssert);
   }
 
   /**
@@ -605,15 +605,16 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    *
    * @return a new {@link LongAssert} instance whose value under test is the result of the parse.
    * @throws AssertionError if the actual value is null or not a valid long.
-   *
    * @since 3.25.0
    */
   public AbstractLongAssert<?> asLong() {
-    try {
-      return InstanceOfAssertFactories.LONG.createAssert(Long.parseLong(actual)).withAssertionState(myself);
-    } catch (NumberFormatException e) {
-      throw failures.failure(info, shouldBeNumeric(actual, LONG));
-    }
+    return executeAssertionNavigation(() -> {
+      try {
+        return InstanceOfAssertFactories.LONG.createAssert(Long.parseLong(actual)).withAssertionState(myself);
+      } catch (NumberFormatException e) {
+        throw failures.failure(info, shouldBeNumeric(actual, LONG));
+      }
+    }, LongAssert::nullLongAssert);
   }
 
   /**
@@ -630,15 +631,16 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    *
    * @return a new {@link FloatAssert} instance whose value under test is the result of the parse.
    * @throws AssertionError if the actual value is null or not a parseable float.
-   *
    * @since 3.25.0
    */
   public AbstractFloatAssert<?> asFloat() {
-    try {
-      return InstanceOfAssertFactories.FLOAT.createAssert(Float.parseFloat(actual)).withAssertionState(myself);
-    } catch (NumberFormatException | NullPointerException e) {
-      throw failures.failure(info, shouldBeNumeric(actual, FLOAT));
-    }
+    return executeAssertionNavigation(() -> {
+      try {
+        return InstanceOfAssertFactories.FLOAT.createAssert(Float.parseFloat(actual)).withAssertionState(myself);
+      } catch (NumberFormatException | NullPointerException e) {
+        throw failures.failure(info, shouldBeNumeric(actual, FLOAT));
+      }
+    }, FloatAssert::nullFloatAssert);
   }
 
   /**
@@ -655,14 +657,15 @@ public class AbstractStringAssert<SELF extends AbstractStringAssert<SELF>> exten
    *
    * @return a new {@link DoubleAssert} instance whose value under test is the result of the parse.
    * @throws AssertionError if the actual value is null or not a parseable double.
-   *
    * @since 3.25.0
    */
   public AbstractDoubleAssert<?> asDouble() {
-    try {
-      return InstanceOfAssertFactories.DOUBLE.createAssert(Double.parseDouble(actual)).withAssertionState(myself);
-    } catch (NumberFormatException | NullPointerException e) {
-      throw failures.failure(info, shouldBeNumeric(actual, DOUBLE));
-    }
+    return executeAssertionNavigation(() -> {
+      try {
+        return InstanceOfAssertFactories.DOUBLE.createAssert(Double.parseDouble(actual)).withAssertionState(myself);
+      } catch (NumberFormatException | NullPointerException e) {
+        throw failures.failure(info, shouldBeNumeric(actual, DOUBLE));
+      }
+    }, DoubleAssert::nullDoubleAssert);
   }
 }

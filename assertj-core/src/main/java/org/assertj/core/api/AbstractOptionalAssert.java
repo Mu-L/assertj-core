@@ -44,16 +44,15 @@ import org.assertj.core.presentation.PredicateDescription;
 /**
  * Assertions for {@link java.util.Optional}.
  *
- * @param <SELF> the "self" type of this assertion class.
+ * @param <SELF>  the "self" type of this assertion class.
  * @param <VALUE> type of the value contained in the {@link java.util.Optional}.
- *
  * @author Jean-Christophe Gay
  * @author Nicolai Parlog
  * @author Grzegorz Piwowarek
  * @author JongJun Kim
  */
 // Deprecation is raised by JDK-17. IntelliJ thinks this is redundant when it is not.
-@SuppressWarnings({ "deprecation", "RedundantSuppression", "OptionalGetWithoutIsPresent" })
+@SuppressWarnings({ "deprecation", "RedundantSuppression", "OptionalGetWithoutIsPresent", "OptionalAssignedToNull" })
 public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert<SELF, VALUE>, VALUE> extends
     AbstractAssertWithComparator<SELF, Optional<VALUE>> {
 
@@ -70,7 +69,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * <p>
    * Assertion succeeds:
    * <pre><code class='java'> assertThat(Optional.of("something")).isPresent();</code></pre>
-   *
+   * <p>
    * Assertion fails:
    * <pre><code class='java'> assertThat(Optional.empty()).isPresent();</code></pre>
    *
@@ -85,7 +84,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * <p>
    * Assertion succeeds:
    * <pre><code class='java'> assertThat(Optional.of("something")).isNotEmpty();</code></pre>
-   *
+   * <p>
    * Assertion fails:
    * <pre><code class='java'> assertThat(Optional.empty()).isNotEmpty();</code></pre>
    *
@@ -100,7 +99,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * <p>
    * Assertion succeeds:
    * <pre><code class='java'> assertThat(Optional.empty()).isEmpty();</code></pre>
-   *
+   * <p>
    * Assertion fails:
    * <pre><code class='java'> assertThat(Optional.of("something")).isEmpty();</code></pre>
    *
@@ -118,7 +117,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * <p>
    * Assertion succeeds:
    * <pre><code class='java'> assertThat(Optional.empty()).isNotPresent();</code></pre>
-   *
+   * <p>
    * Assertion fails:
    * <pre><code class='java'> assertThat(Optional.of("something")).isNotPresent();</code></pre>
    *
@@ -134,7 +133,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * Assertion succeeds:
    * <pre><code class='java'> assertThat(Optional.of("something")).contains("something");
    * assertThat(Optional.of(10)).contains(10);</code></pre>
-   *
+   * <p>
    * Assertion fails:
    * <pre><code class='java'> assertThat(Optional.of("something")).contains("something else");
    * assertThat(Optional.of(20)).contains(10);</code></pre>
@@ -168,7 +167,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    *   assertThat(s).startsWith("some");
    *   assertThat(s).endsWith("thing");
    * }); </code></pre>
-   *
+   * <p>
    * Assertions will fail :
    * <pre><code class='java'> assertThat(Optional.of("something")).hasValueSatisfying(s -&gt; {
    *     assertThat(s).isEqualTo("something else");
@@ -265,7 +264,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * assertThat(Optional.of("something")).hasValueMatching(s -&gt; s.startsWith("else"), "starts with 'else'");
    * assertThat(Optional.empty()).hasValueMatching(s -&gt; true, "any");</code></pre>
    *
-   * @param predicate the predicate to match.
+   * @param predicate   the predicate to match.
    * @param description the description of the predicate.
    * @return this assertion object.
    */
@@ -289,7 +288,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * Assertion succeeds:
    * <pre><code class='java'> assertThat(Optional.of("something")).hasValue("something");
    * assertThat(Optional.of(10)).contains(10);</code></pre>
-   *
+   * <p>
    * Assertion fails:
    * <pre><code class='java'> assertThat(Optional.of("something")).hasValue("something else");
    * assertThat(Optional.of(20)).contains(10);</code></pre>
@@ -306,13 +305,13 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * <p>
    * Assertion succeeds:
    * <pre><code class='java'> assertThat(Optional.of("something")).doesNotHaveValue("something else");</code></pre>
-   *
+   * <p>
    * Assertion fails:
    * <pre><code class='java'> assertThat(Optional.of("something")).doesNotHaveValue("something");</code></pre>
    *
    * @param expectedValue the expected value inside the {@link java.util.Optional}.
-   * @throws NullPointerException if the given value is {@code null}; use {@link #isNotPresent()} or {@link #isNotEmpty()} instead.
    * @return this assertion object.
+   * @throws NullPointerException if the given value is {@code null}; use {@link #isNotPresent()} or {@link #isNotEmpty()} instead.
    * @since 3.28.0
    */
   public SELF doesNotHaveValue(VALUE expectedValue) {
@@ -333,7 +332,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    *                                     .containsInstanceOf(Object.class);
    *
    * assertThat(Optional.of(10)).containsInstanceOf(Integer.class);</code></pre>
-   *
+   * <p>
    * Assertion fails:
    *
    * <pre><code class='java'> assertThat(Optional.of("something")).containsInstanceOf(Integer.class);</code></pre>
@@ -368,8 +367,8 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * assertThat(Optional.of(frodo)).usingValueComparator(new FieldByFieldComparator()).contains(frodoClone);</code></pre>
    *
    * @param customComparator the comparator to use for incoming assertion checks.
-   * @throws NullPointerException if the given comparator is {@code null}.
    * @return {@code this} assertion object.
+   * @throws NullPointerException if the given comparator is {@code null}.
    */
   @CheckReturnValue
   public SELF usingValueComparator(Comparator<? super VALUE> customComparator) {
@@ -403,7 +402,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    *
    * // Java will create the same 'Integer' instance when boxing small ints
    * assertThat(Optional.of(10)).containsSame(10);</code></pre>
-   *
+   * <p>
    * Assertion fails:
    *
    * <pre><code class='java'> // not even equal:
@@ -449,7 +448,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * assertThat(Optional.of("something")).flatMap(UPPER_CASE_OPTIONAL_STRING)
    *                                     .contains("something");</code></pre>
    *
-   * @param <U> the type wrapped in the {@link Optional} after the {@link Optional#flatMap(Function) flatMap} operation.
+   * @param <U>    the type wrapped in the {@link Optional} after the {@link Optional#flatMap(Function) flatMap} operation.
    * @param mapper the {@link Function} to use in the {@link Optional#flatMap(Function) flatMap} operation.
    * @return a new {@link AbstractOptionalAssert} for assertions chaining on the flatMap of the Optional.
    * @throws AssertionError if the actual {@link Optional} is null.
@@ -457,8 +456,10 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    */
   @CheckReturnValue
   public <U> AbstractOptionalAssert<?, U> flatMap(Function<? super VALUE, Optional<U>> mapper) {
-    isNotNull();
-    return assertThat(actual.flatMap(mapper)).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      isNotNull();
+      return assertThat(actual.flatMap(mapper)).withAssertionState(myself);
+    }, OptionalAssert::nullOptionalAssert);
   }
 
   /**
@@ -477,7 +478,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * assertThat(Optional.of("42")).map(String::length)
    *                              .contains(3);</code></pre>
    *
-   * @param <U> the type wrapped in the {@link Optional} after the {@link Optional#map(Function) map} operation.
+   * @param <U>    the type wrapped in the {@link Optional} after the {@link Optional#map(Function) map} operation.
    * @param mapper the {@link Function} to use in the {@link Optional#map(Function) map} operation.
    * @return a new {@link AbstractOptionalAssert} for assertions chaining on the map of the Optional.
    * @throws AssertionError if the actual {@link Optional} is null.
@@ -485,10 +486,12 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    */
   @CheckReturnValue
   public <U> AbstractOptionalAssert<?, U> map(Function<? super VALUE, ? extends U> mapper) {
-    isNotNull();
-    OptionalAssert<U> result = assertThat(actual.map(mapper));
-    result.withAssertionState(myself);
-    return result;
+    return executeAssertionNavigation(() -> {
+      isNotNull();
+      OptionalAssert<U> result = assertThat(actual.map(mapper));
+      result.withAssertionState(myself);
+      return result;
+    }, OptionalAssert::nullOptionalAssert);
   }
 
   /**
@@ -510,8 +513,8 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * @return a new {@link AbstractObjectAssert} for assertions chaining on the value of the Optional.
    * @throws AssertionError if the actual {@link Optional} is null.
    * @throws AssertionError if the actual {@link Optional} is empty.
-   * @since 3.9.0
    * @see #get(InstanceOfAssertFactory)
+   * @since 3.9.0
    */
   @CheckReturnValue
   public AbstractObjectAssert<?, VALUE> get() {
@@ -539,8 +542,8 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * @param assertFactory the factory which verifies the type and creates the new {@code Assert}
    * @return a new narrowed {@link Assert} instance for assertions chaining on the value of the Optional
    * @throws NullPointerException if the given factory is {@code null}
-   * @throws AssertionError if the actual {@link Optional} is null
-   * @throws AssertionError if the actual {@link Optional} is empty
+   * @throws AssertionError       if the actual {@link Optional} is null
+   * @throws AssertionError       if the actual {@link Optional} is empty
    * @since 3.14.0
    */
   @CheckReturnValue
@@ -576,7 +579,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * drSheldon.setName("Sheldon Kooper");
    * assertThat(doctor).usingRecursiveComparison()
    *                   .isEqualTo(person);</code></pre>
-   *
+   * <p>
    * A detailed documentation for the recursive comparison is available here: <a href="https://assertj.github.io/doc/#assertj-core-recursive-comparison">https://assertj.github.io/doc/#assertj-core-recursive-comparison</a>.
    * <p>
    * The default recursive comparison behavior is {@link RecursiveComparisonConfiguration configured} as follows:
@@ -604,8 +607,8 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
 
   /**
    * Same as {@link #usingRecursiveComparison()} but allows to specify your own {@link RecursiveComparisonConfiguration}.
-   * @param recursiveComparisonConfiguration the {@link RecursiveComparisonConfiguration} used in the chained {@link RecursiveComparisonAssert#isEqualTo(Object) isEqualTo} assertion.
    *
+   * @param recursiveComparisonConfiguration the {@link RecursiveComparisonConfiguration} used in the chained {@link RecursiveComparisonAssert#isEqualTo(Object) isEqualTo} assertion.
    * @return a new {@link RecursiveComparisonAssert} instance built with the given {@link RecursiveComparisonConfiguration}.
    */
   @Override
@@ -621,7 +624,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    *
    * <p>The recursive algorithm employs cycle detection, so object graphs with cyclic references can safely be asserted over without causing looping.</p>
    *
-   * <p>This method enables recursive asserting using default configuration, which means all fields of all objects have the   
+   * <p>This method enables recursive asserting using default configuration, which means all fields of all objects have the
    * {@link java.util.function.Predicate} applied to them (including primitive fields), no fields are excluded, but:
    * <ul>
    *   <li>The recursion does not enter into Java Class Library types (java.*, javax.*)</li>
@@ -715,9 +718,11 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
   }
 
   private AbstractObjectAssert<?, VALUE> internalGet() {
-    isPresent();
-    // noinspection OptionalGetWithoutIsPresent
-    return assertThat(actual.get()).withAssertionState(myself);
+    return executeAssertionNavigation(() -> {
+      isPresent();
+      // noinspection OptionalGetWithoutIsPresent
+      return assertThat(actual.get()).withAssertionState(myself);
+    }, ObjectAssert::nullObjectAssert);
   }
 
   private void checkNotNull(Object expectedValue) {
