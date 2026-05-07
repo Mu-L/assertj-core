@@ -165,7 +165,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @since 2.6.0 / 3.6.0
    */
   public SELF isBlank() {
-    return executeAssertion(() -> assertBlank());
+    return executeAssertion(this::assertBlank);
   }
 
   private void assertBlank() {
@@ -199,7 +199,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @since 2.6.0 / 3.6.0
    */
   public SELF isNotBlank() {
-    return executeAssertion(() -> assertNotBlank());
+    return executeAssertion(this::assertNotBlank);
   }
 
   private void assertNotBlank() {
@@ -226,7 +226,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @since 3.11.0
    */
   public SELF containsWhitespaces() {
-    return executeAssertion(() -> assertContainsWhitespaces());
+    return executeAssertion(this::assertContainsWhitespaces);
   }
 
   private void assertContainsWhitespaces() {
@@ -255,7 +255,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @since 2.9.0 / 3.9.0
    */
   public SELF containsOnlyWhitespaces() {
-    return executeAssertion(() -> assertContainsOnlyWhitespaces());
+    return executeAssertion(this::assertContainsOnlyWhitespaces);
   }
 
   private void assertContainsOnlyWhitespaces() {
@@ -282,7 +282,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @since 3.11.0
    */
   public SELF doesNotContainAnyWhitespaces() {
-    return executeAssertion(() -> assertDoesNotContainAnyWhitespaces());
+    return executeAssertion(this::assertDoesNotContainAnyWhitespaces);
   }
 
   private void assertDoesNotContainAnyWhitespaces() {
@@ -316,7 +316,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @since 2.9.0 / 3.9.0
    */
   public SELF doesNotContainOnlyWhitespaces() {
-    return executeAssertion(() -> assertDoesNotContainOnlyWhitespaces());
+    return executeAssertion(this::assertDoesNotContainOnlyWhitespaces);
   }
 
   private void assertDoesNotContainOnlyWhitespaces() {
@@ -1299,7 +1299,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @throws AssertionError       if the actual {@code CharSequence} does not match the given regular expression.
    */
   public SELF matchesSatisfying(CharSequence regex, Consumer<Matcher> matchSatisfies) {
-    return internalMatchesSatisfying(Pattern.compile(regex.toString()), matchSatisfies);
+    return matchesSatisfying(Pattern.compile(regex.toString()), matchSatisfies);
   }
 
   /**
@@ -1360,17 +1360,14 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @throws AssertionError       if the actual {@code CharSequence} does not match the given regular expression.
    */
   public SELF matchesSatisfying(Pattern pattern, Consumer<Matcher> matchSatisfies) {
-    return internalMatchesSatisfying(pattern, matchSatisfies);
-  }
-
-  // internal method to avoid double proxying if one assertion calls another one
-  private SELF internalMatchesSatisfying(Pattern pattern, Consumer<Matcher> matchSatisfies) {
     return executeAssertion(() -> {
       Matcher matcher = pattern.matcher(actual);
       strings.assertMatches(info, actual, matcher);
       matchSatisfies.accept(matcher);
     });
   }
+
+  // internal method to avoid double proxying if one assertion calls another one
 
   /**
    * Verifies that the actual {@code CharSequence} does not match the given regular expression pattern.
@@ -1689,7 +1686,7 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @throws AssertionError       if the given regular expression cannot be found in the actual {@code CharSequence}.
    */
   public SELF containsPatternSatisfying(CharSequence regex, Consumer<Matcher> matchSatisfies) {
-    return internalContainsPatternSatisfying(Pattern.compile(regex.toString()), matchSatisfies);
+    return containsPatternSatisfying(Pattern.compile(regex.toString()), matchSatisfies);
   }
 
   /**
@@ -1730,10 +1727,6 @@ public abstract class AbstractCharSequenceAssert<SELF extends AbstractCharSequen
    * @throws AssertionError       if the given regular expression cannot be found in the actual {@code CharSequence}.
    */
   public SELF containsPatternSatisfying(Pattern pattern, Consumer<Matcher> matchSatisfies) {
-    return internalContainsPatternSatisfying(pattern, matchSatisfies);
-  }
-
-  private SELF internalContainsPatternSatisfying(Pattern pattern, Consumer<Matcher> matchSatisfies) {
     return executeAssertion(() -> {
       Matcher matcher = pattern.matcher(actual);
       strings.assertContainsPattern(info, actual, matcher);

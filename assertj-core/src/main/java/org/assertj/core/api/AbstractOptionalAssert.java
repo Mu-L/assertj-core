@@ -180,7 +180,11 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * @return this assertion object.
    */
   public SELF hasValueSatisfying(Consumer<VALUE> requirement) {
-    return internalHasValueSatisfying(requirement);
+    return executeAssertion(() -> {
+      assertValueIsPresent();
+      // noinspection OptionalGetWithoutIsPresent
+      requirement.accept(actual.get());
+    });
   }
 
   /**
@@ -194,15 +198,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * @return this assertion object.
    */
   public SELF hasValueSatisfying(ThrowingConsumer<VALUE> requirement) {
-    return internalHasValueSatisfying(requirement);
-  }
-
-  private SELF internalHasValueSatisfying(Consumer<VALUE> requirement) {
-    return executeAssertion(() -> {
-      assertValueIsPresent();
-      // noinspection OptionalGetWithoutIsPresent
-      requirement.accept(actual.get());
-    });
+    return hasValueSatisfying((Consumer<VALUE>)requirement);
   }
 
   /**

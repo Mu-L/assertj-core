@@ -447,10 +447,6 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
   @Override
   @SafeVarargs
   public final SELF startsWith(ELEMENT... sequence) {
-    return internalStartsWith(sequence);
-  }
-
-  protected SELF internalStartsWith(ELEMENT[] sequence) {
     return executeAssertion(() -> iterables.assertStartsWith(info, actual, sequence));
   }
 
@@ -2625,8 +2621,7 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
   @CheckReturnValue
   public <T> SELF filteredOn(Function<? super ELEMENT, T> function, T expectedValue) {
     checkArgument(function != null, "The filter function should not be null");
-    // call internalFilteredOn to avoid double proxying in soft assertions
-    return internalFilteredOn(element -> java.util.Objects.equals(function.apply(element), expectedValue));
+    return filteredOn(element -> java.util.Objects.equals(function.apply(element), expectedValue));
   }
 
   /**
@@ -2650,7 +2645,10 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
    * @since 3.11.0
    */
   public SELF filteredOnAssertions(Consumer<? super ELEMENT> elementAssertions) {
-    return internalFilteredOnAssertions(elementAssertions);
+    checkArgument(elementAssertions != null, "The element assertions should not be null");
+    List<? extends ELEMENT> filteredIterable = stream(actual.spliterator(), false).filter(byPassingAssertions(elementAssertions))
+                                                                                  .collect(toList());
+    return newAbstractIterableAssert(filteredIterable).withAssertionState(myself);
   }
 
   /**
@@ -2678,14 +2676,7 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
    * @since 3.21.0
    */
   public SELF filteredOnAssertions(ThrowingConsumer<? super ELEMENT> elementAssertions) {
-    return internalFilteredOnAssertions(elementAssertions);
-  }
-
-  private SELF internalFilteredOnAssertions(Consumer<? super ELEMENT> elementAssertions) {
-    checkArgument(elementAssertions != null, "The element assertions should not be null");
-    List<? extends ELEMENT> filteredIterable = stream(actual.spliterator(), false).filter(byPassingAssertions(elementAssertions))
-                                                                                  .collect(toList());
-    return newAbstractIterableAssert(filteredIterable).withAssertionState(myself);
+    return filteredOnAssertions((Consumer<? super ELEMENT>)elementAssertions);
   }
 
   // navigable assertions
@@ -3112,7 +3103,9 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
    * @throws IllegalArgumentException if the given predicate is {@code null}.
    */
   public SELF filteredOn(Predicate<? super ELEMENT> predicate) {
-    return internalFilteredOn(predicate);
+    checkArgument(predicate != null, "The filter predicate should not be null");
+    List<? extends ELEMENT> filteredIterable = stream(actual.spliterator(), false).filter(predicate).collect(toList());
+    return newAbstractIterableAssert(filteredIterable).withAssertionState(myself);
   }
 
   @Override
@@ -3128,16 +3121,12 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
 
   @Override
   public SELF allSatisfy(Consumer<? super ELEMENT> requirements) {
-    return internalAllSatisfy(requirements);
+    return executeAssertion(() -> iterables.assertAllSatisfy(info, actual, requirements));
   }
 
   @Override
   public SELF allSatisfy(ThrowingConsumer<? super ELEMENT> requirements) {
-    return internalAllSatisfy(requirements);
-  }
-
-  private SELF internalAllSatisfy(Consumer<? super ELEMENT> requirements) {
-    return executeAssertion(() -> iterables.assertAllSatisfy(info, actual, requirements));
+    return allSatisfy((Consumer<? super ELEMENT>)requirements);
   }
 
   @Override
@@ -3186,30 +3175,22 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
 
   @Override
   public SELF anySatisfy(Consumer<? super ELEMENT> requirements) {
-    return internalAnySatisfy(requirements);
-  }
-
-  @Override
-  public SELF anySatisfy(ThrowingConsumer<? super ELEMENT> requirements) {
-    return internalAnySatisfy(requirements);
-  }
-
-  private SELF internalAnySatisfy(Consumer<? super ELEMENT> requirements) {
     return executeAssertion(() -> iterables.assertAnySatisfy(info, actual, requirements));
   }
 
   @Override
+  public SELF anySatisfy(ThrowingConsumer<? super ELEMENT> requirements) {
+    return anySatisfy((Consumer<? super ELEMENT>)requirements);
+  }
+
+  @Override
   public SELF noneSatisfy(Consumer<? super ELEMENT> restrictions) {
-    return internalNoneSatisfy(restrictions);
+    return executeAssertion(() -> iterables.assertNoneSatisfy(info, actual, restrictions));
   }
 
   @Override
   public SELF noneSatisfy(ThrowingConsumer<? super ELEMENT> restrictions) {
-    return internalNoneSatisfy(restrictions);
-  }
-
-  private SELF internalNoneSatisfy(Consumer<? super ELEMENT> restrictions) {
-    return executeAssertion(() -> iterables.assertNoneSatisfy(info, actual, restrictions));
+    return noneSatisfy((Consumer<? super ELEMENT>)restrictions);
   }
 
   @Override
@@ -3530,12 +3511,6 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
   SELF withComparatorsForElementPropertyOrFieldTypes(TypeComparators comparatorsForElementPropertyOrFieldTypes) {
     this.comparatorsForElementPropertyOrFieldTypes = comparatorsForElementPropertyOrFieldTypes;
     return myself;
-  }
-
-  private SELF internalFilteredOn(Predicate<? super ELEMENT> predicate) {
-    checkArgument(predicate != null, "The filter predicate should not be null");
-    List<? extends ELEMENT> filteredIterable = stream(actual.spliterator(), false).filter(predicate).collect(toList());
-    return newAbstractIterableAssert(filteredIterable).withAssertionState(myself);
   }
 
   /**
