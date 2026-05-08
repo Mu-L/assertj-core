@@ -72,7 +72,6 @@ class IterableAssert_anySatisfy_with_ThrowingConsumer_Test extends IterableAsser
     then(throwable).isSameAs(runtimeException);
   }
 
-
   @Test
   public void should_work_with_soft_assertions() {
     // GIVEN

@@ -2676,7 +2676,7 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
    * @since 3.21.0
    */
   public SELF filteredOnAssertions(ThrowingConsumer<? super ELEMENT> elementAssertions) {
-    return filteredOnAssertions((Consumer<? super ELEMENT>)elementAssertions);
+    return filteredOnAssertions((Consumer<? super ELEMENT>) elementAssertions);
   }
 
   // navigable assertions
@@ -3126,7 +3126,7 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
 
   @Override
   public SELF allSatisfy(ThrowingConsumer<? super ELEMENT> requirements) {
-    return allSatisfy((Consumer<? super ELEMENT>)requirements);
+    return allSatisfy((Consumer<? super ELEMENT>) requirements);
   }
 
   @Override
@@ -3180,7 +3180,7 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
 
   @Override
   public SELF anySatisfy(ThrowingConsumer<? super ELEMENT> requirements) {
-    return anySatisfy((Consumer<? super ELEMENT>)requirements);
+    return anySatisfy((Consumer<? super ELEMENT>) requirements);
   }
 
   @Override
@@ -3190,7 +3190,7 @@ public abstract class AbstractIterableAssert<SELF extends AbstractIterableAssert
 
   @Override
   public SELF noneSatisfy(ThrowingConsumer<? super ELEMENT> restrictions) {
-    return noneSatisfy((Consumer<? super ELEMENT>)restrictions);
+    return noneSatisfy((Consumer<? super ELEMENT>) restrictions);
   }
 
   @Override

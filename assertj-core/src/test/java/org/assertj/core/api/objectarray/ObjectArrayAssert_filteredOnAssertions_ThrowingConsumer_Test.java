@@ -103,5 +103,4 @@ class ObjectArrayAssert_filteredOnAssertions_ThrowingConsumer_Test extends Objec
     then(softly.assertionErrorsCollected()).singleElement(THROWABLE).hasMessage("error message");
   }
 
-
 }

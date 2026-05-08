@@ -198,7 +198,7 @@ public abstract class AbstractOptionalAssert<SELF extends AbstractOptionalAssert
    * @return this assertion object.
    */
   public SELF hasValueSatisfying(ThrowingConsumer<VALUE> requirement) {
-    return hasValueSatisfying((Consumer<VALUE>)requirement);
+    return hasValueSatisfying((Consumer<VALUE>) requirement);
   }
 
   /**

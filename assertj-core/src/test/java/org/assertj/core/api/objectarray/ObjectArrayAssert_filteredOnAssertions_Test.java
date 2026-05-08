@@ -83,5 +83,4 @@ class ObjectArrayAssert_filteredOnAssertions_Test extends ObjectArrayAssert_filt
     then(softly.assertionErrorsCollected()).singleElement(THROWABLE).hasMessage("error message");
   }
 
-
 }

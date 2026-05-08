@@ -2701,7 +2701,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    * @since 3.21.0
    */
   public SELF filteredOnAssertions(ThrowingConsumer<? super ELEMENT> elementAssertions) {
-    return filteredOnAssertions((Consumer<? super ELEMENT>)elementAssertions);
+    return filteredOnAssertions((Consumer<? super ELEMENT>) elementAssertions);
   }
 
   /**
@@ -2727,8 +2727,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF allMatch(Predicate<? super ELEMENT> predicate) {
-    iterables.assertAllMatch(info, newArrayList(actual), predicate, PredicateDescription.GIVEN);
-    return myself;
+    return allMatch(predicate, PredicateDescription.GIVEN.description);
   }
 
   /**
@@ -2736,8 +2735,8 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF allMatch(Predicate<? super ELEMENT> predicate, String predicateDescription) {
-    iterables.assertAllMatch(info, newArrayList(actual), predicate, new PredicateDescription(predicateDescription));
-    return myself;
+    return executeAssertion(() -> iterables.assertAllMatch(info, List.of(actual), predicate,
+                                                           new PredicateDescription(predicateDescription)));
   }
 
   /**
@@ -2783,7 +2782,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF allSatisfy(ThrowingConsumer<? super ELEMENT> requirements) {
-    return allSatisfy((Consumer<? super ELEMENT>)requirements);
+    return allSatisfy((Consumer<? super ELEMENT>) requirements);
   }
 
   /**
@@ -2809,8 +2808,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF anyMatch(Predicate<? super ELEMENT> predicate) {
-    iterables.assertAnyMatch(info, newArrayList(actual), predicate, PredicateDescription.GIVEN);
-    return myself;
+    return anyMatch(predicate, PredicateDescription.GIVEN.description);
   }
 
   /**
@@ -2840,8 +2838,8 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF anyMatch(Predicate<? super ELEMENT> predicate, String predicateDescription) {
-    iterables.assertAnyMatch(info, newArrayList(actual), predicate, new PredicateDescription(predicateDescription));
-    return myself;
+    return executeAssertion(() -> iterables.assertAnyMatch(info, List.of(actual), predicate,
+                                                           new PredicateDescription(predicateDescription)));
   }
 
   /**
@@ -2874,8 +2872,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   public <OTHER_ELEMENT> SELF zipSatisfy(OTHER_ELEMENT[] other,
                                          BiConsumer<? super ELEMENT, OTHER_ELEMENT> zipRequirements) {
-    iterables.assertZipSatisfy(info, newArrayList(actual), newArrayList(other), zipRequirements);
-    return myself;
+    return executeAssertion(() -> iterables.assertZipSatisfy(info, List.of(actual), List.of(other), zipRequirements));
   }
 
   /**
@@ -2883,7 +2880,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF anySatisfy(Consumer<? super ELEMENT> requirements) {
-    return executeAssertion(() ->  iterables.assertAnySatisfy(info, newArrayList(actual), requirements));
+    return executeAssertion(() -> iterables.assertAnySatisfy(info, newArrayList(actual), requirements));
   }
 
   /**
@@ -2921,7 +2918,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF anySatisfy(ThrowingConsumer<? super ELEMENT> requirements) {
-    return anySatisfy((Consumer<? super ELEMENT>)requirements);
+    return anySatisfy((Consumer<? super ELEMENT>) requirements);
   }
 
   /**
@@ -2929,7 +2926,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF noneSatisfy(Consumer<? super ELEMENT> restrictions) {
-    return executeAssertion(() ->  iterables.assertNoneSatisfy(info, newArrayList(actual), restrictions));
+    return executeAssertion(() -> iterables.assertNoneSatisfy(info, newArrayList(actual), restrictions));
   }
 
   /**
@@ -2967,7 +2964,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF noneSatisfy(ThrowingConsumer<? super ELEMENT> restrictions) {
-    return noneSatisfy((Consumer<? super ELEMENT>)restrictions);
+    return noneSatisfy((Consumer<? super ELEMENT>) restrictions);
   }
 
   /**
@@ -3013,8 +3010,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
   @Override
   @SafeVarargs
   public final SELF satisfiesExactly(Consumer<? super ELEMENT>... requirements) {
-    iterables.assertSatisfiesExactly(info, newArrayList(actual), requirements);
-    return myself;
+    return executeAssertion(() -> iterables.assertSatisfiesExactly(info, List.of(actual), requirements));
   }
 
   /**
@@ -3122,8 +3118,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
   @Override
   @SafeVarargs
   public final SELF satisfiesExactlyInAnyOrder(Consumer<? super ELEMENT>... requirements) {
-    iterables.assertSatisfiesExactlyInAnyOrder(info, newArrayList(actual), requirements);
-    return myself;
+    return executeAssertion(() -> iterables.assertSatisfiesExactlyInAnyOrder(info, List.of(actual), requirements));
   }
 
   /**
@@ -3208,8 +3203,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF satisfiesOnlyOnce(Consumer<? super ELEMENT> requirements) {
-    iterables.assertSatisfiesOnlyOnce(info, newArrayList(actual), requirements);
-    return myself;
+    return executeAssertion(() -> iterables.assertSatisfiesOnlyOnce(info, List.of(actual), requirements));
   }
 
   /**
@@ -3326,8 +3320,7 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF noneMatch(Predicate<? super ELEMENT> predicate) {
-    iterables.assertNoneMatch(info, newArrayList(actual), predicate, PredicateDescription.GIVEN);
-    return myself;
+    return noneMatch(predicate, PredicateDescription.GIVEN.description);
   }
 
   /**
@@ -3358,8 +3351,8 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @Override
   public SELF noneMatch(Predicate<? super ELEMENT> predicate, String predicateDescription) {
-    iterables.assertNoneMatch(info, newArrayList(actual), predicate, new PredicateDescription(predicateDescription));
-    return myself;
+    return executeAssertion(() -> iterables.assertNoneMatch(info, List.of(actual), predicate,
+                                                            new PredicateDescription(predicateDescription)));
   }
 
   /**
@@ -3590,7 +3583,8 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @CheckReturnValue
   public ObjectAssert<ELEMENT> singleElement() {
-    return internalSingleElement();
+    return executeAssertionNavigation(this::internalSingleElement,
+                                      () -> toAssert(null, navigationDescription("check single element")));
   }
 
   /**
@@ -3632,7 +3626,8 @@ public abstract class AbstractObjectArrayAssert<SELF extends AbstractObjectArray
    */
   @CheckReturnValue
   public <ASSERT extends AbstractAssert<?, ?>> ASSERT singleElement(InstanceOfAssertFactory<?, ASSERT> assertFactory) {
-    return internalSingleElement().asInstanceOf(assertFactory);
+    return executeAssertionNavigation(() -> internalSingleElement().asInstanceOf(assertFactory),
+                                      () -> nullValueAssert(assertFactory));
   }
 
   private ObjectAssert<ELEMENT> internalSingleElement() {

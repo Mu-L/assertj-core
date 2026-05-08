@@ -65,7 +65,6 @@ class IterableAssert_filteredOn_predicate_Test extends IterableAssert_filtered_b
     assertThat(assertion.info.overridingErrorMessage()).isEqualTo("error message");
   }
 
-
   @Test
   public void should_work_with_soft_assertions() {
     // GIVEN

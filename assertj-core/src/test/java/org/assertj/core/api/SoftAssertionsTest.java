@@ -1300,6 +1300,32 @@ class SoftAssertionsTest extends BaseAssertionsTest {
   }
 
   @Test
+  void array_soft_assertions_should_work_with_singleElement_navigation() {
+    // GIVEN
+    Name[] names = array(name("Jane", "Doe"));
+    // WHEN
+    softly.assertThat(names)
+          .as("single element")
+          .singleElement()
+          .isNotNull();
+    softly.assertThat(names)
+          .as("single element")
+          .overridingErrorMessage("error message")
+          .singleElement()
+          .isNull();
+    softly.assertThat(names)
+          .as("single element as Name")
+          .overridingErrorMessage("error message")
+          .singleElement(as(type(Name.class)))
+          .isNull();
+    // THEN
+    List<Throwable> errorsCollected = softly.errorsCollected();
+    then(errorsCollected).hasSize(2);
+    then(errorsCollected.get(0)).hasMessage("[single element check single element] error message");
+    then(errorsCollected.get(1)).hasMessage("[single element as Name check single element] error message");
+  }
+
+  @Test
   void list_soft_assertions_should_work_with_singleElement_navigation() {
     // GIVEN
     List<Name> names = list(name("Jane", "Doe"));
